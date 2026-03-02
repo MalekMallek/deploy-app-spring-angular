@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Récupérer le code
+      # 1️⃣ Récupération du code
       - name: Récupération du code
         uses: actions/checkout@v4
 
@@ -21,32 +21,36 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 3️⃣ Compiler le backend Spring Boot
+      # 3️⃣ Rendre mvnw exécutable
+      - name: Rendre mvnw exécutable
+        run: chmod +x ./springboot/app/mvnw
+
+      # 4️⃣ Compiler le backend Spring Boot
       - name: Build Spring Boot jar
         run: |
           cd springboot/app
           ./mvnw clean package -DskipTests
 
-      # 4️⃣ Build Docker image Backend
+      # 5️⃣ Build Docker image Backend
       - name: Build Backend
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/spring-backend:latest ./springboot/app
 
-      # 5️⃣ Build Docker image Frontend
+      # 6️⃣ Build Docker image Frontend
       - name: Build Frontend
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/angular-frontend:latest ./angular-app
 
-      # 6️⃣ Push Backend
+      # 7️⃣ Push Backend
       - name: Push Backend
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/spring-backend:latest
 
-      # 7️⃣ Push Frontend
+      # 8️⃣ Push Frontend
       - name: Push Frontend
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/angular-frontend:latest
 
-      # 8️⃣ Lancer application pour test
+      # 9️⃣ Lancer application pour test
       - name: Lancer application (test CI)
         run: docker compose up -d
 
-      # 9️⃣ Vérifier conteneurs
+      # 🔟 Vérifier conteneurs
       - name: Vérifier conteneurs
         run: docker ps
